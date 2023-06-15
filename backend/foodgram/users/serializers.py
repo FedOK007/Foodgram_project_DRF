@@ -7,11 +7,9 @@ from djoser.serializers import UserSerializer
 from rest_framework import serializers
 
 from users.models import Subscriptions
-from recieps.models import Reciep
+from recipes.models import Recipe
 
 User = get_user_model()
-
-# class CustomUserSerializer(UserSerializer):
 
 
 class CustomUserSerializer(serializers.ModelSerializer):
@@ -20,21 +18,17 @@ class CustomUserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
         fields = ('id', 'username', 'first_name', 'last_name', 'email', 'is_subscribed', )
-        # fields = tuple(User.REQUIRED_FIELDS) + (
-        #     settings.USER_ID_FIELD,
-        #     settings.LOGIN_FIELD,
-        #     'is_subscribed'
-        # )
         read_only_fields = ('id', 'username', 'first_name', 'last_name', 'email', 'is_subscribed', 'is_subscribed', )
 
     def get_is_subscribed(self, obj):
         request = self.context.get('request')
-        if request and request.user != obj and not request.user.is_anonymous:
+        if request:
             current_user = request.user
-            return Subscriptions.objects.filter(
-                subscriber=current_user,
-                subscription=obj
-            ).exists()
+            if current_user != obj and current_user.is_authenticated:
+                return Subscriptions.objects.filter(
+                    subscriber=current_user,
+                    subscription=obj
+                ).exists()
         return False
 
 
@@ -47,37 +41,34 @@ class Base64ImageField(serializers.ImageField):
         return super().to_internal_value(data)
 
 
-class FilterReciepsSerializer(serializers.ListSerializer):
-    ''' customization ListSerializer (many=true) behabiour 
+class FilterRecipesSerializer(serializers.ListSerializer):
+    ''' customization ListSerializer (many=true) behaviour 
         more info https://www.django-rest-framework.org/api-guide/serializers/
     '''
     def to_representation(self, data):
-        print(data)
-        recieps_limit = self.context.get('request').query_params.get('recieps_limit')
+        recipes_limit = self.context.get('request').query_params.get('recipes_limit')
         try:
-            recieps_limit = int(recieps_limit)
-        except Exception:
-            pass
-        if recieps_limit and isinstance(recieps_limit, int) and recieps_limit > 0:
-            print(data)
-            data = data.all()[:recieps_limit]
-            print(data.query)
+            recipes_limit = int(recipes_limit)
+        except (ValueError, TypeError):
+            return super().to_representation(data)
+        if recipes_limit and recipes_limit > 0:
+            data = data.all()[:recipes_limit]
         return super().to_representation(data)
 
 
-class ReciepSerializer(serializers.ModelSerializer):
+class RecipeSerializer(serializers.ModelSerializer):
     image = Base64ImageField(required=True, allow_null=False)
 
     class Meta:
-        list_serializer_class = FilterReciepsSerializer
-        model = Reciep
+        list_serializer_class = FilterRecipesSerializer
+        model = Recipe
         fields = ('id', 'name', 'image', 'cooking_time')
         read_only_fields = ('id', 'name', 'image', 'cooking_time')
 
 
 class SubscriptionUserSerializer(UserSerializer):
-    recipes = ReciepSerializer(many=True)
-    is_subscribed = serializers.SerializerMethodField()
+    recipes = RecipeSerializer(many=True)
+    is_subscribed = serializers.BooleanField(default=True, read_only=True)
     recipes_count = serializers.SerializerMethodField()
 
     class Meta:
@@ -92,18 +83,3 @@ class SubscriptionUserSerializer(UserSerializer):
 
     def get_recipes_count(self, obj):
         return obj.recipes.all().count()
-
-    def get_is_subscribed(self, obj):
-        return True
-
-    # def get_recieps(self, obj):
-    #     recipes_limit = self.context.get('request').query_params.get('recipes_limit')
-    #     print(recipes_limit)
-    #     return ReciepSerializer(obj[:1])
-
-    # def validate(self, data):
-    #     if self.instance == self.context['request'].user:
-    #         raise serializers.ValidationError(
-    #             {"errors": "You can not subscribe yorself"}
-    #         )
-    #     return data

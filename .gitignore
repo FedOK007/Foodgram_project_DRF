@@ -132,5 +132,7 @@ dmypy.json
 .idea
 
 *.DS_Store
+frontend/
 frontend/*
+frontend/package.json
 backend/foodgram/media/

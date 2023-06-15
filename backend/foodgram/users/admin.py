@@ -10,9 +10,7 @@ class UserAdmin(admin.ModelAdmin):
     list_display = ('username',
                     'email',
                     )
-    # list_editable = ('email',)
     search_fields = ('username', 'email',)
-    # list_filter = ('username',)
     empty_value_display = '-пусто-'
 
 
@@ -21,7 +19,5 @@ class SubscriptionAdmin(admin.ModelAdmin):
     search_fields = ('subscriber', 'subscription',)
     empty_value_display = '-пусто-'
 
-
-# Register your models here.
 admin.site.register(User, UserAdmin)
 admin.site.register(Subscriptions, SubscriptionAdmin)

@@ -3,9 +3,6 @@ from django.contrib.auth.models import AbstractUser
 from django.db import models
 
 
-CROP_LEN_TEXT = settings.CROP_LEN_TEXT
-
-
 class User(AbstractUser):
     email = models.EmailField(
         'e-mail',
@@ -32,6 +29,7 @@ class User(AbstractUser):
     class Meta:
         verbose_name = 'Пользователь'
         verbose_name_plural = 'Пользователи'
+        ordering = ('-username',)
 
     @property
     def is_admin(self):
@@ -39,12 +37,8 @@ class User(AbstractUser):
             self.is_superuser or self.is_staff
         )
 
-    # def save(self, *args, **kwargs):
-        # self.set_password(self.password)
-        # super().save(*args, **kwargs)
-
     def __str__(self):
-        return self.username[:CROP_LEN_TEXT]
+        return self.username[:settings.CROP_LEN_TEXT]
 
 
 class Subscriptions(models.Model):

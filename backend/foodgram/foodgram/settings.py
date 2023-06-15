@@ -46,10 +46,11 @@ INSTALLED_APPS = [
     'django_filters',
     'users.apps.UsersConfig',
     'api.apps.ApiConfig',
-    'recieps.apps.ReciepsConfig',
+    'recipes.apps.RecipesConfig',
     'rest_framework',
     'rest_framework.authtoken',
     'djoser',
+    'colorfield',
 ]
 
 MIDDLEWARE = [
@@ -166,3 +167,4 @@ STATIC_ROOT = os.path.join(BASE_DIR, 'static')
 
 PDF_FONTS_DIR = os.path.join(BASE_DIR, os.getenv('PDF_FONTS_DIR'))
 PDF_FONTS_FILE = os.getenv('PDF_FONTS_FILE')
+PDF_FONTS_FONTSIZE = int(os.getenv('PDF_FONTS_FONTSIZE', 12))

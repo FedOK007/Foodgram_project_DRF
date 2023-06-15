@@ -1,16 +1,16 @@
-from rest_framework import viewsets
-from rest_framework.response import Response
 from django.contrib.auth import get_user_model
-
-from users.serializers import SubscriptionUserSerializer
-from users.models import Subscriptions
+from django.shortcuts import get_object_or_404
+from djoser.serializers import UserCreateSerializer
+from rest_framework import viewsets
+from rest_framework import status
 from rest_framework.decorators import action
 from rest_framework.permissions import AllowAny, IsAuthenticated
-from rest_framework import status
-from django.shortcuts import get_object_or_404
+from rest_framework.response import Response
 
+from users.models import Subscriptions
+from users.serializers import SubscriptionUserSerializer
 from users.serializers import CustomUserSerializer
-from djoser.serializers import UserCreateSerializer
+
 
 User = get_user_model()
 
@@ -21,12 +21,12 @@ class SubscriptionUserViewSet(viewsets.ModelViewSet):
     permission_classes = [IsAuthenticated, ]
 
     def get_permissions(self):
-        if self.action == "create":
+        if self.action == 'create':
             self.permission_classes = [AllowAny, ]
         return super().get_permissions()
 
     def get_serializer_class(self):
-        if self.action == "create":
+        if self.action == 'create':
             return UserCreateSerializer
         return self.serializer_class
 
@@ -37,8 +37,10 @@ class SubscriptionUserViewSet(viewsets.ModelViewSet):
         permission_classes=[IsAuthenticated, ]
     )
     def me(self, request, id=None):
-        context = {'request': self.request}
-        serializer = CustomUserSerializer(request.user, context=context)
+        serializer = CustomUserSerializer(
+            request.user,
+            context={'request': self.request}
+        )
         return Response(serializer.data)
 
     @action(
@@ -52,11 +54,12 @@ class SubscriptionUserViewSet(viewsets.ModelViewSet):
             subscription__subscriber=request.user
         )
         page = self.paginate_queryset(subscription)
-        # print(User.objects.filter(subscription__subscriber=request.user).query)
-        context = {'request': request}
-        serializer = SubscriptionUserSerializer(page, many=True, context=context)
+        serializer = SubscriptionUserSerializer(
+            page,
+            many=True,
+            context={'request': request}
+        )
         return self.get_paginated_response(serializer.data)
-        #return Response(serializer.data, status=status.HTTP_200_OK)
 
     @action(
         detail=True,
@@ -75,33 +78,11 @@ class SubscriptionUserViewSet(viewsets.ModelViewSet):
             subscriber=request.user,
             subscription=user
         ).first()
-        if request.method == 'DELETE':
-            if not subscription:
-                return Response(
-                    {'errors': 'Subscription does not exist'},
-                    status=status.HTTP_400_BAD_REQUEST
-                )
-            # try:
-            #     subscription = Subscriptions.objects.get(
-            #         subscriber=request.user,
-            #         subscription=user
-            #     )
-            # except Subscriptions.DoesNotExist:
-            #     return Response(
-            #         {'errors': 'Subscription does not exist'},
-            #         status=status.HTTP_400_BAD_REQUEST
-            #     )
-            subscription.delete()
-            return Response(status=status.HTTP_204_NO_CONTENT)
         if request.method == 'POST':
-            # context = {
-            #     'request': request
-            # }
-            # serializer = SubscriptionUserSerializer(instance=user, data=request.data, context=context)
-            # if not serializer.is_valid():
-            #     return Response(serializer.errors)
-            context = {'request': request}
-            serializer = SubscriptionUserSerializer(instance=user, context=context)
+            serializer = SubscriptionUserSerializer(
+                instance=user,
+                context={'request': request}
+            )
             if subscription:
                 return Response(
                     {'errors': 'Subscription already exist'},
@@ -115,15 +96,10 @@ class SubscriptionUserViewSet(viewsets.ModelViewSet):
                 serializer.data,
                 status=status.HTTP_201_CREATED
             )
-
-
-
-
-
-# class SubscriptionViewSet(APIView):
-#     def get(self, request, user_id):
-#         return Response({'user_id': user_id})
-
-# class SubscriptionViewSet(viewsets.ModelViewSet):
-#     queryset = User.objects.all()
-#     serializer_class = SubscriptionUserSerializer
+        if not subscription:
+            return Response(
+                {'errors': 'Subscription does not exist'},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+        subscription.delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)
