@@ -87,10 +87,15 @@ WSGI_APPLICATION = 'foodgram.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/3.2/ref/settings/#databases
 
+
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+        'ENGINE': os.getenv('DB_ENGINE', 'django.db.backends.sqlite3'),
+        'NAME': os.getenv('DB_NAME', os.path.join(BASE_DIR, 'db.sqlite3')),
+        'USER': os.getenv('POSTGRES_USER', None),
+        'PASSWORD': os.getenv('POSTGRES_PASSWORD', None),
+        'HOST': os.getenv('DB_HOST', None),
+        'PORT': os.getenv('DB_PORT', None)
     }
 }
 
@@ -165,6 +170,5 @@ MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 STATIC_URL = '/static/'
 STATIC_ROOT = os.path.join(BASE_DIR, 'static')
 
-PDF_FONTS_DIR = os.path.join(BASE_DIR, os.getenv('PDF_FONTS_DIR'))
-PDF_FONTS_FILE = os.getenv('PDF_FONTS_FILE')
+PDF_FONTS_FILE = os.getenv('PDF_FONTS_FILE', 'arial.ttf')
 PDF_FONTS_FONTSIZE = int(os.getenv('PDF_FONTS_FONTSIZE', 12))

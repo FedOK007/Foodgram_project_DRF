@@ -1,4 +1,5 @@
 import io
+from pathlib import Path
 
 from django.conf import settings
 from django.http import FileResponse
@@ -15,6 +16,7 @@ from recipes.models import Recipe
 PDF_FORNT = settings.PDF_FONTS_FILE
 PDF_FONTS_FONTSIZE = settings.PDF_FONTS_FONTSIZE
 PDF_FORNT_NAME = PDF_FORNT.split('.')[0]
+PDF_FONTS_DIR = str(Path(__file__).resolve().parent) + '/fonts'
 
 
 def get_ingredients_for_pfd(request):
@@ -40,7 +42,9 @@ def get_ingredients_for_pfd(request):
 
 
 def generatePDF(request):
-    rl_config.TTFSearchPath.append(str(settings.PDF_FONTS_DIR))
+    rl_config.TTFSearchPath.append(PDF_FONTS_DIR) # add path for find custom font
+    print(PDF_FONTS_DIR)
+    print(rl_config.TTFSearchPath)
     shopping_list = get_ingredients_for_pfd(request)
     buffer = io.BytesIO()
     page = canvas.Canvas(buffer, pagesize=A4)

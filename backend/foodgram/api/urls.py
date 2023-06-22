@@ -7,11 +7,6 @@ from users.views import SubscriptionUserViewSet
 
 router_v1 = DefaultRouter()
 router_v1.register('users', SubscriptionUserViewSet, basename='users')
-# router.register(
-#     r'users/(?P<user_id>\d+)/subscribe',
-#     SubscriptionViewSet,
-#     basename='subscribe'
-# )
 router_v1.register('tags', TagsViewSet, basename='tags')
 router_v1.register('ingredients', IngredientVieWSet, basename='ingredients')
 router_v1.register('recipes', RecipeViewSet, basename='pecieps')

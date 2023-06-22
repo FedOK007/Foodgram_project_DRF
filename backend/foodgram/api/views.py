@@ -1,27 +1,29 @@
-from django.conf import settings
 from django_filters.rest_framework import DjangoFilterBackend
-from rest_framework import status, viewsets
+from rest_framework import status
 from rest_framework.decorators import action, api_view, permission_classes
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
+from rest_framework.viewsets import ModelViewSet, ReadOnlyModelViewSet
 
 from recipes.models import Favorite, Ingredient, Recipe, ShoppingCart, Tag
 from api.filters import RecipeFilter, IngrigientFilter
 from api.permissions import IsAuthor
-from api.serializers import FavoriteSerializer, IngredientSerializer
-from api.serializers import RecipeSerializer, RecipeWriteSerializer
-from api.serializers import RecipeShoppingcartSerializer, TagSerializer
+from api.serializers import (
+    FavoriteSerializer, IngredientSerializer,
+    RecipeSerializer, RecipeWriteSerializer,
+    RecipeShoppingcartSerializer, TagSerializer
+)
 from api.utils import generatePDF
 
 
-class TagsViewSet(viewsets.ReadOnlyModelViewSet):
+class TagsViewSet(ReadOnlyModelViewSet):
     queryset = Tag.objects.all()
     serializer_class = TagSerializer
     permission_classes = [AllowAny, ]
     pagination_class = None
 
 
-class IngredientVieWSet(viewsets.ReadOnlyModelViewSet):
+class IngredientVieWSet(ReadOnlyModelViewSet):
     queryset = Ingredient.objects.all()
     serializer_class = IngredientSerializer
     permission_classes = [AllowAny, ]
@@ -30,7 +32,7 @@ class IngredientVieWSet(viewsets.ReadOnlyModelViewSet):
     filter_class = IngrigientFilter
 
 
-class RecipeViewSet(viewsets.ModelViewSet):
+class RecipeViewSet(ModelViewSet):
     queryset = Recipe.objects.select_related('author').all().order_by('-id')
     serializer_class = RecipeSerializer
     permission_classes = [AllowAny, ]
@@ -49,6 +51,53 @@ class RecipeViewSet(viewsets.ModelViewSet):
             self.permission_classes = [IsAuthor, ]
         return super().get_permissions()
 
+    def _extra_action_methods_universal(self, name, request, pk=None):
+        instance = Recipe.objects.get(id=pk)
+        available_actions = {
+            'favorite': {
+                'related_model': instance.favorite_recipe,
+                'model': Favorite,
+                'serialiser_class': FavoriteSerializer,
+            },
+            'shopping_cart': {
+                'related_model': instance.shoppingcarts_recipe,
+                'model': ShoppingCart,
+                'serialiser_class': RecipeShoppingcartSerializer,
+            }
+        }
+
+        if name not in available_actions:
+            return Response(
+                    {'errors': 'Bad request'},
+                    status=status.HTTP_400_BAD_REQUEST
+                )
+        related_models = available_actions[name]['related_model']
+        serializer_class = available_actions[name]['serialiser_class']
+        model = available_actions[name]['model']
+
+        related_object = related_models.filter(user=request.user).first()
+
+        if request.method == 'POST':
+            if related_object:
+                return Response(
+                    {'errors': f'Recipes is already in {name}'},
+                    status=status.HTTP_400_BAD_REQUEST
+                )
+            serializer = serializer_class(instance=instance)
+            model.objects.create(
+                user=request.user,
+                recipe=instance
+            )
+            return Response(serializer.data)
+
+        if not related_object:
+            return Response(
+                {'errors': f'Recipes in {name} does not exist'},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+        related_object.delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)
+
     @action(
         detail=True,
         methods=['POST', 'DELETE', ],
@@ -56,28 +105,7 @@ class RecipeViewSet(viewsets.ModelViewSet):
         permission_classes=[IsAuthenticated, ]
     )
     def favorite(self, request, pk=None):
-        instance = Recipe.objects.get(id=pk)
-        favorite = instance.favorite_recipe.filter(user=request.user).first()
-        if request.method == 'POST':
-            if favorite:
-                return Response(
-                    {'errors': 'Recipes is already in favorites'},
-                    status=status.HTTP_400_BAD_REQUEST
-                )
-            serializer = FavoriteSerializer(instance=instance)
-            Favorite.objects.create(
-                user=request.user,
-                recipe=instance
-            )
-            return Response(serializer.data)
-
-        if not favorite:
-            return Response(
-                {'errors': 'Recipes in favorites does not exist'},
-                status=status.HTTP_400_BAD_REQUEST
-            )
-        favorite.delete()
-        return Response(status=status.HTTP_204_NO_CONTENT)
+        return self._extra_action_methods_universal('favorite', request, pk)
 
     @action(
         detail=True,
@@ -86,27 +114,11 @@ class RecipeViewSet(viewsets.ModelViewSet):
         permission_classes=[IsAuthenticated, ]
     )
     def shopping_cart(self, request, pk=None):
-        instance = Recipe.objects.get(id=pk)
-        shopping_cart = instance.shoppingcarts_recipe.filter(user=request.user).first()
-        if request.method == 'POST':
-            if shopping_cart:
-                return Response(
-                    {'errors': 'Recipes is already in shopping cart'},
-                    status=status.HTTP_400_BAD_REQUEST
-                )
-            serializer = RecipeShoppingcartSerializer(instance=instance)
-            ShoppingCart.objects.create(
-                user=request.user,
-                recipe=instance
-            )
-            return Response(serializer.data)
-        if not shopping_cart:
-            return Response(
-                {'errors': 'Recipes in shopping cart does not exist'},
-                status=status.HTTP_400_BAD_REQUEST
-            )
-        shopping_cart.delete()
-        return Response(status=status.HTTP_204_NO_CONTENT)
+        return self._extra_action_methods_universal(
+            'shopping_cart',
+            request,
+            pk
+        )
 
     def perform_create(self, serializer):
         serializer.save(author=self.request.user)

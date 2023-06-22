@@ -51,7 +51,7 @@ class FilterRecipesSerializer(serializers.ListSerializer):
             recipes_limit = int(recipes_limit)
         except (ValueError, TypeError):
             return super().to_representation(data)
-        if recipes_limit and recipes_limit > 0:
+        if recipes_limit > 0:
             data = data.all()[:recipes_limit]
         return super().to_representation(data)
 

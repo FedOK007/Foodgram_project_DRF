@@ -1,6 +1,3 @@
-import base64
-
-from django.core.files.base import ContentFile
 from rest_framework import serializers
 
 from recipes.models import Ingredient, Recipe, RecipeToIngredient, Tag
@@ -58,15 +55,6 @@ class RecipeToIngredientSerializer(serializers.ModelSerializer):
         read_only_fields = ('name', 'measurement_unit')
 
 
-# class Base64ImageField(serializers.ImageField):
-#     def to_internal_value(self, data):
-#         if isinstance(data, str) and data.startswith('data:image'):
-#             format, imgstr = data.split(';base64,')
-#             ext = format.split('/')[-1]
-#             data = ContentFile(base64.b64decode(imgstr), name='temp.' + ext)
-#         return super().to_internal_value(data)
-
-
 class RecipeSerializer(serializers.ModelSerializer):
     image = Base64ImageField(required=True, allow_null=False)
     tags = TagSerializer(required=True, many=True)
@@ -90,28 +78,35 @@ class RecipeSerializer(serializers.ModelSerializer):
     # def get_ingredients(self, obj):
     #     return RecipeToIngredientSerializer(obj.recipe_ingridients.all(), many=True).data
 
-    def check_user(self):
+    def _check_user(self):
         request = self.context.get('request')
         user = request.user
         if user.is_anonymous:
             return False
         return user
 
-    def get_is_favorited(self, obj):
-        user = self.check_user()
+    def _check_existing_obj(self, name, filter_parameters):
+        user = self._check_user()
         if not user:
             return False
-        return user.favorites.filter(recipe=obj).exists()
+        return getattr(user, name).filter(**filter_parameters).exists()
+
+    def get_is_favorited(self, obj):
+        name = 'favorites'
+        filter_parameters = {'recipe': obj}
+        return self._check_existing_obj(name, filter_parameters)
 
     def get_is_in_shopping_cart(self, obj):
-        user = self.check_user()
-        if not user:
-            return False
-        return user.shoppingcarts.filter(recipe=obj).exists()
+        name = 'shoppingcarts'
+        filter_parameters = {'recipe': obj}
+        return self._check_existing_obj(name, filter_parameters)
 
 
 class RecipeWriteSerializer(serializers.ModelSerializer):
-    tags = serializers.PrimaryKeyRelatedField(queryset=Tag.objects.all(), many=True)
+    tags = serializers.PrimaryKeyRelatedField(
+        queryset=Tag.objects.all(),
+        many=True
+    )
     ingredients = RecipeToIngredientSerializer(many=True)
     image = Base64ImageField(required=True)
 
@@ -139,6 +134,7 @@ class RecipeWriteSerializer(serializers.ModelSerializer):
         tags = validated_data.pop('tags')
         ingredients = validated_data.pop('ingredients')
         super().update(instance, validated_data)
+        # alternatives
         # for key, value in validated_data.items():
         #     setattr(instance, key, value)
         # instance.save()

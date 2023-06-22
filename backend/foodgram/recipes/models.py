@@ -99,18 +99,6 @@ class Recipe(models.Model):
         through='RecipeToTag',
         verbose_name='Теги'
     )
-    # favorites = models.ManyToManyField(
-    #     User,
-    #     through='Favorite',
-    #     verbose_name='Списки избранного',
-    #     related_name='recipesinfavorites'
-    # )
-    # shoppingcarts = models.ManyToManyField(
-    #     User,
-    #     through='ShoppingCart',
-    #     verbose_name='Списки покупок',
-    #     related_name='recipesinshoppingcart'
-    # )
 
     class Meta:
         verbose_name = 'Рецепт'
