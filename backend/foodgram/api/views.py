@@ -68,9 +68,9 @@ class RecipeViewSet(ModelViewSet):
 
         if name not in available_actions:
             return Response(
-                    {'errors': 'Bad request'},
-                    status=status.HTTP_400_BAD_REQUEST
-                )
+                {'errors': 'Bad request'},
+                status=status.HTTP_400_BAD_REQUEST
+            )
         related_models = available_actions[name]['related_model']
         serializer_class = available_actions[name]['serialiser_class']
         model = available_actions[name]['model']
