@@ -12,10 +12,7 @@ router_v1.register('ingredients', IngredientVieWSet, basename='ingredients')
 router_v1.register('recipes', RecipeViewSet, basename='pecieps')
 
 urlpatterns = [
-    # path(r'auth/users/<int:user_id>/subscribe/', SubscriptionViewSet.as_view()),
     path('recipes/download_shopping_cart/', GeneratePDFApi),
     path('', include(router_v1.urls)),
-    # path('', include('djoser.urls')),
     path('auth/', include('djoser.urls.authtoken')),
-    # path('shoppingcart/', DownloadShoppingCart.as_view())
 ]

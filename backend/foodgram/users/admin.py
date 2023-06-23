@@ -19,5 +19,6 @@ class SubscriptionAdmin(admin.ModelAdmin):
     search_fields = ('subscriber', 'subscription',)
     empty_value_display = '-пусто-'
 
+
 admin.site.register(User, UserAdmin)
 admin.site.register(Subscriptions, SubscriptionAdmin)

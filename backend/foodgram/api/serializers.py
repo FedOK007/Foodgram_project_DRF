@@ -75,9 +75,6 @@ class RecipeSerializer(serializers.ModelSerializer):
         read_only_fields = ('id', 'author', 'is_favorited',
                             'is_in_shopping_cart', )
 
-    # def get_ingredients(self, obj):
-    #     return RecipeToIngredientSerializer(obj.recipe_ingridients.all(), many=True).data
-
     def _check_user(self):
         request = self.context.get('request')
         user = request.user
@@ -126,7 +123,8 @@ class RecipeWriteSerializer(serializers.ModelSerializer):
         tags = validated_data.pop('tags')
         ingredients = validated_data.pop('ingredients')
         recipe = Recipe.objects.create(**validated_data)
-        recipe.tags.set(tags) # clear related data in tags and set a new
+        # clear related data in tags and set a new
+        recipe.tags.set(tags)
         self.create_ingredients(ingredients, recipe)
         return recipe
 

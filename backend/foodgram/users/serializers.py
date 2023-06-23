@@ -17,8 +17,23 @@ class CustomUserSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = User
-        fields = ('id', 'username', 'first_name', 'last_name', 'email', 'is_subscribed', )
-        read_only_fields = ('id', 'username', 'first_name', 'last_name', 'email', 'is_subscribed', 'is_subscribed', )
+        fields = (
+            'id',
+            'username',
+            'first_name',
+            'last_name',
+            'email',
+            'is_subscribed',
+        )
+        read_only_fields = (
+            'id',
+            'username',
+            'first_name',
+            'last_name',
+            'email',
+            'is_subscribed',
+            'is_subscribed',
+        )
 
     def get_is_subscribed(self, obj):
         request = self.context.get('request')
@@ -42,11 +57,12 @@ class Base64ImageField(serializers.ImageField):
 
 
 class FilterRecipesSerializer(serializers.ListSerializer):
-    ''' customization ListSerializer (many=true) behaviour 
+    ''' customization ListSerializer (many=true) behaviour
         more info https://www.django-rest-framework.org/api-guide/serializers/
     '''
     def to_representation(self, data):
-        recipes_limit = self.context.get('request').query_params.get('recipes_limit')
+        request = self.context.get('request')
+        recipes_limit = request.query_params.get('recipes_limit')
         try:
             recipes_limit = int(recipes_limit)
         except (ValueError, TypeError):

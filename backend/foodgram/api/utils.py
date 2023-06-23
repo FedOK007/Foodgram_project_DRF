@@ -42,7 +42,8 @@ def get_ingredients_for_pfd(request):
 
 
 def generatePDF(request):
-    rl_config.TTFSearchPath.append(PDF_FONTS_DIR) # add path for find custom font
+    # add path for find custom font
+    rl_config.TTFSearchPath.append(PDF_FONTS_DIR)
     print(PDF_FONTS_DIR)
     print(rl_config.TTFSearchPath)
     shopping_list = get_ingredients_for_pfd(request)
@@ -58,4 +59,8 @@ def generatePDF(request):
     page.showPage()
     page.save()
     buffer.seek(0)
-    return FileResponse(buffer, as_attachment=True, filename='shopping_cart.pdf')
+    return FileResponse(
+        buffer,
+        as_attachment=True,
+        filename='shopping_cart.pdf'
+    )

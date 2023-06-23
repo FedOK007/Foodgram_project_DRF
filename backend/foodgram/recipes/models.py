@@ -136,7 +136,11 @@ class RecipeToIngredient(models.Model):
         ]
 
     def __str__(self):
-        return f'{self.recipe}_{self.ingredient}_{self.amount}'[:settings.CROP_LEN_TEXT]
+        return (
+            f'{self.recipe}_'
+            '{self.ingredient}_'
+            '{self.amount}'[:settings.CROP_LEN_TEXT]
+        )
 
 
 class RecipeToTag(models.Model):

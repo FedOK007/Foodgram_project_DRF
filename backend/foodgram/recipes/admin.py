@@ -1,7 +1,8 @@
 from django.contrib import admin
-from django.contrib.auth import get_user_model
 
-from recipes.models import Tag, Recipe, Ingredient, RecipeToIngredient, RecipeToTag, ShoppingCart
+from recipes.models import (
+    Tag, Recipe, Ingredient, RecipeToIngredient, RecipeToTag, ShoppingCart
+)
 
 
 class TagAdmin(admin.ModelAdmin):

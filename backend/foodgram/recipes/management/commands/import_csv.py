@@ -13,13 +13,14 @@ ALLOWED_MODELS = {
 class Command(BaseCommand):
     '''
     Custom management command for load data into the Models from CSV file
-    using: python manage.py import_csv --model <model_name> --path <path_to_the_file>.csv
+    using:
+    python manage.py import_csv --model <model_name> --path <path_to_the_file>
     '''
     help = 'Load a csv file into the database'
 
     def _checker(self, model, path):
         if model not in ALLOWED_MODELS:
-            self.stderr.write(f"Model {model} is not in Allowed list") 
+            self.stderr.write(f"Model {model} is not in Allowed list")
             return False
         if not os.path.exists(path):
             self.stderr.write(f"File {path} doesn't exist")
@@ -30,8 +31,12 @@ class Command(BaseCommand):
         return True
 
     def add_arguments(self, parser):
-        parser.add_argument('--model', type=str, required=True, help="Name of ORM Model")
-        parser.add_argument('--path', type=str, required=True, help="Path to the csv file")
+        parser.add_argument(
+            '--model', type=str, required=True, help="Name of ORM Model"
+        )
+        parser.add_argument(
+            '--path', type=str, required=True, help="Path to the csv file"
+        )
 
     def handle(self, *args, **options):
         model = options['model']
