@@ -218,4 +218,7 @@ class Favorite(models.Model):
         ]
 
     def __str__(self):
-        return f'{self.name[:settings.CROP_LEN_TEXT]} favorites'
+        return (
+            f'favorites {self.user.name}_'
+            f'{self.recipe.name}'[:settings.CROP_LEN_TEXT]
+        )
