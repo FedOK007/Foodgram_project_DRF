@@ -50,7 +50,7 @@ class RecipeFilter(FilterSet):
 class IngrigientFilter(FilterSet):
     name = filters.CharFilter(method='filter_name')
 
-    def filter_name(selg, queryset, name, value):
+    def filter_name(self, queryset, name, value):
         return queryset.filter(name__istartswith=value)
 
     class Meta:

@@ -20,7 +20,7 @@ class CheckRequiredFormSet(BaseInlineFormSet):
                 correct_ingredient_list = True
         if not correct_ingredient_list:
             raise ValidationError('This field could not be empty.')
-            
+
 
 class TagAdmin(admin.ModelAdmin):
     list_display = (

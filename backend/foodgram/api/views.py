@@ -13,7 +13,7 @@ from api.serializers import (
     RecipeSerializer, RecipeWriteSerializer,
     RecipeShoppingcartSerializer, TagSerializer
 )
-from api.utils import generatePDF
+from api.utils import generate_pdf
 
 
 class TagsViewSet(ReadOnlyModelViewSet):
@@ -126,5 +126,5 @@ class RecipeViewSet(ModelViewSet):
 
 @api_view(['GET', ])
 @permission_classes([IsAuthenticated, ])
-def GeneratePDFApi(request):
-    return generatePDF(request)
+def generate_pdf_api(request):
+    return generate_pdf(request)

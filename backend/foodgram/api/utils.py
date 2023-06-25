@@ -41,7 +41,7 @@ def get_ingredients_for_pfd(request):
     return shopping_list
 
 
-def generatePDF(request):
+def generate_pdf(request):
     # add path for find custom font
     rl_config.TTFSearchPath.append(PDF_FONTS_DIR)
     print(PDF_FONTS_DIR)
