@@ -83,10 +83,10 @@ class Recipe(models.Model):
     )
     author = models.ForeignKey(
         User,
-        on_delete=models.SET_NULL,
+        on_delete=models.CASCADE,
         related_name='recipes',
-        blank=True,
-        null=True,
+        blank=False,
+        null=False,
         verbose_name='Автор'
     )
     ingredients = models.ManyToManyField(
@@ -137,9 +137,8 @@ class RecipeToIngredient(models.Model):
 
     def __str__(self):
         return (
-            f'{self.recipe}_'
-            '{self.ingredient}_'
-            '{self.amount}'[:settings.CROP_LEN_TEXT]
+            f'{self.recipe.name}_'
+            f'{self.ingredient.name}'[:settings.CROP_LEN_TEXT]
         )
 
 
@@ -164,6 +163,12 @@ class RecipeToTag(models.Model):
                 name='unique_recipe_tag'
             ),
         ]
+    
+    def __str__(self):
+        return (
+            f'{self.recipe.name}_'
+            f'{self.tag.name}'[:settings.CROP_LEN_TEXT]
+        )
 
 
 class ShoppingCart(models.Model):

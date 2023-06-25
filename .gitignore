@@ -136,3 +136,4 @@ frontend/
 frontend/*
 frontend/package.json
 backend/foodgram/media/
+.vscode

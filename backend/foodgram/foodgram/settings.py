@@ -30,7 +30,7 @@ CROP_LEN_TEXT = int(os.getenv('CROP_LEN_TEXT', 30))
 SECRET_KEY = os.getenv('SECRET_KEY', 'devsecretkeydonotuseitinprod')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = os.getenv('DEBUG', False)
+DEBUG = os.getenv('DEBUG', True)
 
 ALLOWED_HOSTS = os.getenv('ALLOWED_HOSTS', '*').split(',')
 
@@ -88,14 +88,20 @@ WSGI_APPLICATION = 'foodgram.wsgi.application'
 # https://docs.djangoproject.com/en/3.2/ref/settings/#databases
 
 
+# DATABASES = {
+#     'default': {
+#         'ENGINE': os.getenv('DB_ENGINE', 'django.db.backends.sqlite3'),
+#         'NAME': os.getenv('DB_NAME', os.path.join(BASE_DIR, 'db.sqlite3')),
+#         'USER': os.getenv('POSTGRES_USER', None),
+#         'PASSWORD': os.getenv('POSTGRES_PASSWORD', None),
+#         'HOST': os.getenv('DB_HOST', None),
+#         'PORT': os.getenv('DB_PORT', None)
+#     }
+# }
 DATABASES = {
     'default': {
-        'ENGINE': os.getenv('DB_ENGINE', 'django.db.backends.sqlite3'),
-        'NAME': os.getenv('DB_NAME', os.path.join(BASE_DIR, 'db.sqlite3')),
-        'USER': os.getenv('POSTGRES_USER', None),
-        'PASSWORD': os.getenv('POSTGRES_PASSWORD', None),
-        'HOST': os.getenv('DB_HOST', None),
-        'PORT': os.getenv('DB_PORT', None)
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': os.path.join(BASE_DIR, 'db.sqlite3')
     }
 }
 
@@ -136,7 +142,6 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/3.2/howto/static-files/
 
-STATIC_URL = '/static/'
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/3.2/ref/settings/#default-auto-field

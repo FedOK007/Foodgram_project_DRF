@@ -1,9 +1,26 @@
 from django.contrib import admin
+from django.forms.models import BaseInlineFormSet
+from django.core.exceptions import ValidationError
 
 from recipes.models import (
     Tag, Recipe, Ingredient, RecipeToIngredient, RecipeToTag, ShoppingCart
 )
 
+
+class CheckRequiredFormSet(BaseInlineFormSet):
+    def clean(self):
+        super().clean()
+        correct_ingredient_list = False
+        for form in self.forms:
+            if not form.is_valid():
+                return
+            if not form.cleaned_data:
+                raise ValidationError('This field is required.')
+            if not form.cleaned_data.get('DELETE'):
+                correct_ingredient_list = True
+        if not correct_ingredient_list:
+            raise ValidationError('This field could not be empty.')
+            
 
 class TagAdmin(admin.ModelAdmin):
     list_display = (
@@ -35,12 +52,14 @@ class RecipeToIngredientAdmin(admin.ModelAdmin):
 
 class RecipeToIngredientInline(admin.TabularInline):
     model = RecipeToIngredient
-    extra = 1
+    extra = 0
+    formset = CheckRequiredFormSet
 
 
 class RecipeToTagsInline(admin.TabularInline):
     model = RecipeToTag
-    extra = 1
+    extra = 0
+    formset = CheckRequiredFormSet
 
 
 class ShoppingCartInline(admin.TabularInline):
