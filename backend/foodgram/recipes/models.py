@@ -163,7 +163,7 @@ class RecipeToTag(models.Model):
                 name='unique_recipe_tag'
             ),
         ]
-    
+
     def __str__(self):
         return (
             f'{self.recipe.name}_'
