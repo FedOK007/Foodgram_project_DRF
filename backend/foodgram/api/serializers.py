@@ -61,7 +61,6 @@ class RecipeSerializer(serializers.ModelSerializer):
     is_favorited = serializers.SerializerMethodField()
     is_in_shopping_cart = serializers.SerializerMethodField()
     author = CustomUserSerializer(many=False, read_only=True)
-    # ingredients = serializers.SerializerMethodField()
     ingredients = RecipeToIngredientSerializer(
         many=True,
         source='recipe_ingridients'
@@ -123,7 +122,6 @@ class RecipeWriteSerializer(serializers.ModelSerializer):
         tags = validated_data.pop('tags')
         ingredients = validated_data.pop('ingredients')
         recipe = Recipe.objects.create(**validated_data)
-        # clear related data in tags and set a new
         recipe.tags.set(tags)
         self.create_ingredients(ingredients, recipe)
         return recipe
@@ -132,10 +130,6 @@ class RecipeWriteSerializer(serializers.ModelSerializer):
         tags = validated_data.pop('tags')
         ingredients = validated_data.pop('ingredients')
         super().update(instance, validated_data)
-        # alternatives
-        # for key, value in validated_data.items():
-        #     setattr(instance, key, value)
-        # instance.save()
         instance.tags.set(tags)
         instance.ingredients.clear()
         self.create_ingredients(ingredients, instance)

@@ -37,12 +37,10 @@ def get_ingredients_for_pfd(request):
     shopping_list = []
     for key, value in ingredient_list.items():
         shopping_list.append(f'{key} ({value[1]}) - {value[0]}')
-    # text = '\n'.join(shopping_list)
     return shopping_list
 
 
 def generate_pdf(request):
-    # add path for find custom font
     rl_config.TTFSearchPath.append(PDF_FONTS_DIR)
     print(PDF_FONTS_DIR)
     print(rl_config.TTFSearchPath)

@@ -8,14 +8,6 @@ class RecipeFilter(FilterSet):
     is_in_shopping_cart = filters.BooleanFilter(
         method='filter_is_in_shopping_cart'
     )
-    # filter AND style (bug in initial documentation)
-    # tags = filters.CharFilter(field_name='tags__slug', method='filter_tags')
-
-    # filter OR style
-    # tags = filters.AllValuesMultipleFilter(
-    #     field_name='tags__slug',
-    #     method='filter_tags'
-    # )
     tags = filters.ModelMultipleChoiceFilter(
         field_name='tags__slug',
         to_field_name='slug',
@@ -36,10 +28,6 @@ class RecipeFilter(FilterSet):
         return self._filter_universal(queryset, value, filter_parameters)
 
     def filter_tags(self, queryset, name, value):
-        # filter AND style (bug in initial documentation)
-        # return queryset.filter(tags__slug=value).distinct()
-
-        # filter OR style
         return queryset.filter(tags__slug__in=value).distinct()
 
     class Meta:
