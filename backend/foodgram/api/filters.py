@@ -27,8 +27,8 @@ class RecipeFilter(FilterSet):
         filter_parameters = {'shoppingcarts_recipe__user': self.request.user}
         return self._filter_universal(queryset, value, filter_parameters)
 
-    def filter_tags(self, queryset, name, value):
-        return queryset.filter(tags__slug__in=value).distinct()
+    # def filter_tags(self, queryset, name, value):
+    #     return queryset.filter(tags__slug__in=value).distinct()
 
     class Meta:
         model = Recipe

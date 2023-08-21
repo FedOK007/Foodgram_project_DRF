@@ -145,3 +145,4 @@ STATIC_ROOT = os.path.join(BASE_DIR, 'static')
 
 PDF_FONTS_FILE = os.getenv('PDF_FONTS_FILE', 'arial.ttf')
 PDF_FONTS_FONTSIZE = int(os.getenv('PDF_FONTS_FONTSIZE', 12))
+PDF_GENERATED_FILENAME = os.getenv('PDF_GENERATED_FILENAME', 'shopping_cart.pdf')

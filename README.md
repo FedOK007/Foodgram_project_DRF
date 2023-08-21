@@ -1,9 +1,6 @@
 # Educational project Foodgram
 ## Discription
 
-http://51.250.102.154/
-admin@1.ru:123456
-
 This project is a adapted to Docker and Docker-cpmpose api_yamdb project
 
 ### API Documentation:

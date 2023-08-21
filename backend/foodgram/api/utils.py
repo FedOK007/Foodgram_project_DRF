@@ -17,6 +17,7 @@ PDF_FORNT = settings.PDF_FONTS_FILE
 PDF_FONTS_FONTSIZE = settings.PDF_FONTS_FONTSIZE
 PDF_FORNT_NAME = PDF_FORNT.split('.')[0]
 PDF_FONTS_DIR = str(Path(__file__).resolve().parent) + '/fonts'
+PDF_GENERATED_FILENAME = settings.PDF_GENERATED_FILENAME
 
 
 def get_ingredients_for_pfd(request):
@@ -42,8 +43,6 @@ def get_ingredients_for_pfd(request):
 
 def generate_pdf(request):
     rl_config.TTFSearchPath.append(PDF_FONTS_DIR)
-    print(PDF_FONTS_DIR)
-    print(rl_config.TTFSearchPath)
     shopping_list = get_ingredients_for_pfd(request)
     buffer = io.BytesIO()
     page = canvas.Canvas(buffer, pagesize=A4)
@@ -60,5 +59,5 @@ def generate_pdf(request):
     return FileResponse(
         buffer,
         as_attachment=True,
-        filename='shopping_cart.pdf'
+        filename=PDF_GENERATED_FILENAME
     )
